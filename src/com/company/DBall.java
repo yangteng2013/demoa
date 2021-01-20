@@ -33,7 +33,7 @@ public class DBall {
         System.out.println(reds);
 
 
-        List<DoubleBallBean> curCounts = genComsphere(200);
+        List<DoubleBallBean> curCounts = genComsphere(200000);
 //        System.out.println(curCounts);
 
         boolean isAllOddOrEven = isAllOddOrEven(curCounts);
@@ -44,11 +44,12 @@ public class DBall {
 
         List<List<Integer>> lastGoal = new ArrayList<>();
         List<Integer> temps = new ArrayList<>();
-        temps.add(6);//06 08 11 22 25 33
-        temps.add(8);//06 08 11 22 25 33
-        temps.add(11);//06 08 11 22 25 33
-        temps.add(22);//06 08 11 22 25 33
-        temps.add(25);//06 08 11 22 25 33
+        //01 05 07 14 18 33
+        temps.add(1);//06 08 11 22 25 33
+        temps.add(5);//06 08 11 22 25 33
+        temps.add(7);//06 08 11 22 25 33
+        temps.add(14);//06 08 11 22 25 33
+        temps.add(18);//06 08 11 22 25 33
         temps.add(33);//06 08 11 22 25 33
         lastGoal.add(temps);
 
@@ -98,7 +99,8 @@ public class DBall {
     }
 
     private static void checkHadGoal(List<DoubleBallBean> curCounts) {
-        List<String> res = txt2String(new File("D:/ideaworkspace/demoa/src/com/company/abc.txt"));
+//        List<String> res = txt2String(new File("D:/ideaworkspace/demoa/src/com/company/abc.txt"));
+        List<String> res = txt2String(new File("/Users/yt/Downloads/workspace/ideaworkspace/demoa/src/com/company/abc.txt"));
 //        System.out.println(res.toString());
 
         for (String re : res) {
@@ -107,7 +109,7 @@ public class DBall {
                 String zero = arrays[0];
                 String one = arrays[1];
                 List<Integer> cc = new ArrayList<>();
-                String[] ones = one.split(" ");
+                String[] ones = one.split(" ");
                 for (int i = 0; i < ones.length; i++) {
                     cc.add(Integer.valueOf(ones[i]));
                 }
@@ -288,12 +290,30 @@ public class DBall {
             List<Integer> blueItemComArray = new ArrayList<Integer>(blueItemCom);
             Collections.sort(blueItemComArray);
             DoubleBallBean ballBean = new DoubleBallBean();
-            ballBean.blueBalls = blueItemComArray;
-            ballBean.redBall = (int) (Math.random() * 16 + 1);
-            System.out.println(ballBean);
-            countList.add(ballBean);
+
+            //检查当前的篮球是否包含20-29的数，因为判定本期一定会有20+的球出现；
+            boolean isFlag = checkBlueBalls(blueItemComArray);
+            if (isFlag) {
+                ballBean.blueBalls = blueItemComArray;
+                ballBean.redBall = (int) (Math.random() * 16 + 1);
+                System.out.println(ballBean);
+                countList.add(ballBean);
+            }
         }
         return countList;
+    }
+
+    ////检查当前的篮球是否包含20-29的数，因为判定本期一定会有20+的球出现；
+    private static boolean checkBlueBalls(List<Integer> blueItemComArray) {
+        Iterator iterator = blueItemComArray.iterator();
+        boolean isFlag=false;
+        while (iterator.hasNext()) {
+            Integer curNo = (Integer) iterator.next();
+            if (curNo>=20 && curNo<=29){
+                isFlag = true;
+            }
+        }
+        return isFlag;
     }
 
     public static List<String> txt2String(File file) {
@@ -354,6 +374,17 @@ public class DBall {
         }
         System.out.println("aNos.size=" + aNos.size());
         System.out.println("checkLasGoal完成后：" + aNos);
+        for (DoubleBallBean aNo : aNos) {
+            for (int i = 0; i < aNo.blueBalls.size(); i++) {
+                if (i==aNo.blueBalls.size()-1){
+                    System.out.print(aNo.blueBalls.get(i)+"");
+                }else {
+                    System.out.print(aNo.blueBalls.get(i)+" ");
+                }
+            }
+            System.out.println("+"+aNo.redBall);
+        }
+
     }
 
     private static boolean checkItem(List<List<Integer>> hadGoal, DoubleBallBean curItem) {
@@ -376,7 +407,7 @@ public class DBall {
                     break;
                 }
             }
-            System.out.println("最外的循环");
+//            System.out.println("最外的循环");
         }
         return shouldMove;
     }
