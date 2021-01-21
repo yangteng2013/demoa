@@ -33,7 +33,7 @@ public class DBall {
         System.out.println(reds);
 
 
-        List<DoubleBallBean> curCounts = genComsphere(200000);
+        List<DoubleBallBean> curCounts = genComsphere(2000);
 //        System.out.println(curCounts);
 
         boolean isAllOddOrEven = isAllOddOrEven(curCounts);
@@ -293,14 +293,32 @@ public class DBall {
 
             //检查当前的篮球是否包含20-29的数，因为判定本期一定会有20+的球出现；
             boolean isFlag = checkBlueBalls(blueItemComArray);
-            if (isFlag) {
+            boolean isHadSeven = checkBlueBallsHadSeven(blueItemComArray);
+            if (isFlag && !isHadSeven) {
                 ballBean.blueBalls = blueItemComArray;
-                ballBean.redBall = (int) (Math.random() * 16 + 1);
+                ballBean.redBall = getRandom();
                 System.out.println(ballBean);
                 countList.add(ballBean);
             }
         }
         return countList;
+    }
+
+    private static boolean checkBlueBallsHadSeven(List<Integer> blueItemComArray) {
+        for (Integer integer : blueItemComArray) {
+            if (integer.equals(7)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static int getRandom() {
+        int curNo = (int) (Math.random() * 16 + 1);
+        if (curNo==7){
+            return getRandom();
+        }
+        return curNo;
     }
 
     ////检查当前的篮球是否包含20-29的数，因为判定本期一定会有20+的球出现；
