@@ -100,7 +100,7 @@ public class DBall {
 
     private static void checkHadGoal(List<DoubleBallBean> curCounts) {
 //        List<String> res = txt2String(new File("D:/ideaworkspace/demoa/src/com/company/abc.txt"));
-        List<String> res = txt2String(new File("/Users/yt/Downloads/workspace/ideaworkspace/demoa/src/com/company/abc.txt"));
+        List<String> res = txt2String(new File("src/com/company/abc.txt"));
 //        System.out.println(res.toString());
 
         for (String re : res) {
