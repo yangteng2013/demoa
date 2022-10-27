@@ -16,8 +16,136 @@ public class DBall {
 
     public static void main(String[] args) {
 
-        init();
+//        init();
+        init2();
+    }
 
+    private static void init2() {
+
+
+
+//        List<String> res2 = getHadDballs();
+//
+//
+////
+        List<DoubleBallBean> curCounts = genComsphere(10000000);
+//        for (int i = 0; i < curCounts.size(); i++) {
+//            DoubleBallBean doubleBallBean = curCounts.get(i);
+//            System.out.println(doubleBallBean.toString());
+//        }
+//
+//        Set<Integer>blueItemCom = new HashSet<>();
+//        blueItemCom.add(new Integer(1));
+//        blueItemCom.add(new Integer(3));
+//        blueItemCom.add(new Integer(5));
+//        blueItemCom.add(new Integer(7));
+//        blueItemCom.add(new Integer(9));
+//        blueItemCom.add(new Integer(11));
+//
+////        blueItemCom.add(new Integer(2));
+////        blueItemCom.add(new Integer(4));
+////        blueItemCom.add(new Integer(6));
+////        blueItemCom.add(new Integer(8));
+////        blueItemCom.add(new Integer(10));
+////        blueItemCom.add(new Integer(12));
+//
+//        blueItemCom.add(new Integer(13));
+//        blueItemCom.add(new Integer(4));
+//        blueItemCom.add(new Integer(17));
+//        blueItemCom.add(new Integer(18));
+//        blueItemCom.add(new Integer(28));
+//        blueItemCom.add(new Integer(29));
+//        //是否全是奇数或者偶数
+//        boolean isAllOddEvenNo = checkAllOddEvenNo(blueItemCom);
+//        System.out.println(isAllOddEvenNo);
+
+//        checkHadBallIsOddEven(getHadDballs2());
+
+//        checkContinuousCombination(Collections.singletonList(blueItemCom));
+//        checkContinuousCombination(getHadDballs2());
+
+
+    }
+    /**
+     * 输出历史开奖记录中的 连续组合排列
+     * @param res2
+     */
+    private static void checkContinuousCombination(List<Set<Integer>> res2) {
+        Iterator<Set<Integer>> iterator= res2.iterator();
+        int count = 0;
+        while (iterator.hasNext()) {
+            Set<Integer> dball = iterator.next();
+            List<Integer> blueItemComArray = new ArrayList<Integer>(dball);
+            Collections.sort(blueItemComArray);
+
+
+            int countItem = checkContinuoCombination(blueItemComArray,1);
+            if (countItem>0){
+                count++;
+                System.out.println(blueItemComArray + " "+countItem+"次连号");
+            }
+        }
+        System.out.println("历史开奖记录总共"+res2.size()+"次中有"+count+"组连续号码的排列组合");
+    }
+    /**
+     * 输出历史开奖记录中的 全部是奇数 或者偶数的组合
+     * @param res2
+     */
+    private static void checkHadBallIsOddEven(List<Set<Integer>> res2) {
+        Iterator<Set<Integer>> iterator= res2.iterator();
+        int count = 0;
+        while (iterator.hasNext()) {
+            Set<Integer> dball = iterator.next();
+            boolean isAllOddEven = checkAllOddEvenNo(dball);
+            if (isAllOddEven) {
+                List<Integer> blueItemComArray = new ArrayList<Integer>(dball);
+                Collections.sort(blueItemComArray);
+                count++;
+                System.out.println(blueItemComArray);
+            }
+        }
+        System.out.println("历史开奖记录总共"+res2.size()+"次中有"+count+"次全奇数偶数的排列组合");
+    }
+
+    /**
+     * 获取开奖历史记录
+     * @return
+     */
+    private static List<String> getHadDballs() {
+        List<String> res = txt2String(new File("src/com/company/abc.txt"));
+        List<String> res2 =new ArrayList<>();
+        Iterator iterator = res.iterator();
+        while (iterator.hasNext()) {
+            String ssr = (String) iterator.next();
+            String[] srss=ssr.split(",");
+            StringBuilder sb = new StringBuilder();
+            for (int i = 1; i < 8; i++) {
+                sb.append(srss[i]);
+                if (i<7){
+                    sb.append(",");
+                }
+            }
+            res2.add(sb.toString());
+        }
+        res.clear();
+        return res2;
+    }
+
+    private static List<Set<Integer>> getHadDballs2() {
+        List<String> res = txt2String(new File("src/com/company/abc.txt"));
+        List<Set<Integer>> res2 =new ArrayList<>();
+        Iterator iterator = res.iterator();
+        while (iterator.hasNext()) {
+            String ssr = (String) iterator.next();
+            String[] srss=ssr.split(",");
+            Set<Integer> dbs = new HashSet<>();
+            for (int i = 1; i < 7; i++) {
+                dbs.add(Integer.valueOf(srss[i]));
+            }
+            res2.add(dbs);
+        }
+        res.clear();
+        return res2;
     }
 
     private static void init() {
@@ -278,6 +406,10 @@ public class DBall {
 
     private static List<DoubleBallBean> genComsphere(int count) {
         List<DoubleBallBean> countList = new ArrayList<>();
+        int continuousFiveCount=0;
+        int isAllOddEvenCount=0;
+        int isRepeatCount=0;
+        Set<Set<Integer>>blues = new HashSet<>();
         for (int j = 0; j < count; j++) {
             Set<Integer> blueItemCom = new HashSet<>();
             for (int i = 0; i < 6; i++) {
@@ -287,22 +419,80 @@ public class DBall {
                     }
                 }
             }
+            //是否全是奇数或者偶数
+            boolean isAllOddEvenNo = checkAllOddEvenNo(blueItemCom);
+            if (isAllOddEvenNo) {
+                isAllOddEvenCount++;
+                System.out.println("全是偶数/奇数:"+blueItemCom);
+//                continue;
+            }
+
             List<Integer> blueItemComArray = new ArrayList<Integer>(blueItemCom);
             Collections.sort(blueItemComArray);
-            DoubleBallBean ballBean = new DoubleBallBean();
 
-            //检查当前的篮球是否包含20-29的数，因为判定本期一定会有20+的球出现；
-            boolean isFlag = checkBlueBalls(blueItemComArray);
-            boolean isHadSeven = checkBlueBallsHadSeven(blueItemComArray);
-            if (isFlag && !isHadSeven) {
-                ballBean.blueBalls = blueItemComArray;
-                ballBean.redBall = getRandom();
-                System.out.println(ballBean);
-                countList.add(ballBean);
+            int countItem = checkContinuoCombination(blueItemComArray,1);
+            if (countItem>4){
+//                System.out.println("连续5个以上的号："+blueItemComArray);
+                continuousFiveCount++;
             }
+
+            DoubleBallBean ballBean = new DoubleBallBean();
+            if (!blues.add(blueItemCom)) {
+                System.out.println("重复添加blueItemCom:"+blueItemCom);
+                isRepeatCount++;
+                continue;
+            }
+
+            ballBean.blueBalls = blueItemComArray;
+            ballBean.redBall = getRandom();
+            countList.add(ballBean);
+//            //检查当前的篮球是否包含20-29的数，因为判定本期一定会有20+的球出现；
+//            boolean isFlag = checkBlueBalls(blueItemComArray);
+//            boolean isHadSeven = checkBlueBallsHadSeven(blueItemComArray);
+//            if (isFlag && !isHadSeven) {
+//                ballBean.blueBalls = blueItemComArray;
+//                ballBean.redBall = getRandom();
+//                System.out.println(ballBean);
+//                countList.add(ballBean);
+//            }
         }
+
+        int sizeDif = countList.size()-blues.size();
+        System.out.println("奇数偶数："+isAllOddEvenCount+"  continuousFiveCount:"+continuousFiveCount+ " blues.size:" +blues.size()+" countList.size:" +countList.size() +" 重复次数："+ isRepeatCount);
         return countList;
     }
+
+    /**
+     * //是否全是奇数或者偶数
+     * @param blueItemCom
+     * @return
+     */
+    private static boolean checkAllOddEvenNo(Set<Integer> blueItemCom) {
+        int countOdd=0;
+        for (Integer integer : blueItemCom) {
+            int cur = integer.intValue();
+            if (cur%2==0) {
+                countOdd++;
+            }else {
+                countOdd--;
+            }
+        }
+        return Math.abs(countOdd)==blueItemCom.size();
+    }
+    private static int checkContinuoCombination(List<Integer> blueItemCom,int stage) {
+        int count=0;
+        Collections.sort(blueItemCom);
+
+        for (int i = 0; i < blueItemCom.size(); i++) {
+            if (i< blueItemCom.size()-1) {
+                if ((blueItemCom.get(i).intValue()+stage)==blueItemCom.get(i+1).intValue()) {
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
+
 
     private static boolean checkBlueBallsHadSeven(List<Integer> blueItemComArray) {
         for (Integer integer : blueItemComArray) {
