@@ -1,10 +1,11 @@
 # -*- coding:utf-8 -*-
 
 import requests
+import os
 from html.parser import HTMLParser
 
 # ================ define const ===============
-BASEPATH = "F:/"
+BASEPATH = os.getcwd()
 HTMLURLS = ["http://datachart.500.com/ssq/history/newinc/history.php",
             "http://kaijiang.zhcw.com/lishishuju/jsp/ssqInfoList.jsp"]
 HEADERS = [
@@ -48,13 +49,13 @@ HEADERS = [
           ]
 PARAMS = [
           {
-           'start':'1',
-           'end':'22121'
+           'start':'22122',
+           'end':'22124'
           },
           {
             'czId':'1',
             'beginIssue':'1',
-            'endIssue':'2022121',
+            'endIssue':'2022124',
             'currentPageNum':'1',
           },
          ]
