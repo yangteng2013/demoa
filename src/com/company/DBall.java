@@ -17,7 +17,16 @@ public class DBall {
     public static void main(String[] args) {
 
 //        init();
-        init2();
+//        init2();
+        init3();
+    }
+
+    private static void init3() {
+
+        getHadDballs2();
+
+        int winningsNoCount = compireWithWinngsNum(blueItemComArray);
+
     }
 
     private static void init2() {
@@ -28,11 +37,12 @@ public class DBall {
 //
 //
 ////
-        List<DoubleBallBean> curCounts = genComsphere(10000000);
-//        for (int i = 0; i < curCounts.size(); i++) {
-//            DoubleBallBean doubleBallBean = curCounts.get(i);
-//            System.out.println(doubleBallBean.toString());
-//        }
+        List<DoubleBallBean> curCounts = genComsphere(1000);
+        for (int i = 0; i < curCounts.size(); i++) {
+            DoubleBallBean doubleBallBean = curCounts.get(i);
+            System.out.println(doubleBallBean.toString());
+        }
+        System.out.println("curCounts:"+curCounts.size());
 //
 //        Set<Integer>blueItemCom = new HashSet<>();
 //        blueItemCom.add(new Integer(1));
@@ -423,8 +433,8 @@ public class DBall {
             boolean isAllOddEvenNo = checkAllOddEvenNo(blueItemCom);
             if (isAllOddEvenNo) {
                 isAllOddEvenCount++;
-                System.out.println("全是偶数/奇数:"+blueItemCom);
-//                continue;
+//                System.out.println("全是偶数/奇数:"+blueItemCom);
+                continue;
             }
 
             List<Integer> blueItemComArray = new ArrayList<Integer>(blueItemCom);
@@ -438,11 +448,14 @@ public class DBall {
 
             DoubleBallBean ballBean = new DoubleBallBean();
             if (!blues.add(blueItemCom)) {
-                System.out.println("重复添加blueItemCom:"+blueItemCom);
+//                System.out.println("重复添加blueItemCom:"+blueItemCom);
                 isRepeatCount++;
                 continue;
             }
-
+            int winningsNoCount = compireWithWinngsNum(blueItemComArray);
+            if (winningsNoCount<1) {
+                continue;
+            }
             ballBean.blueBalls = blueItemComArray;
             ballBean.redBall = getRandom();
             countList.add(ballBean);
@@ -457,9 +470,51 @@ public class DBall {
 //            }
         }
 
+//        Set<Integer>curItem = new HashSet<>();
+//        //02,03,07,12,20,31
+//        String itesm = "01,11,12,14,16,25";
+//        String[] ssr=itesm.split(",");
+//        for (int i = 0; i < ssr.length; i++) {
+//            curItem.add(Integer.valueOf(ssr[i]));
+//        }
+//        List<Integer> blueItemComArray = new ArrayList<Integer>(curItem);
+//        Collections.sort(blueItemComArray);
+//        int winningsNoCount = compireWithWinngsNum(blueItemComArray);
         int sizeDif = countList.size()-blues.size();
         System.out.println("奇数偶数："+isAllOddEvenCount+"  continuousFiveCount:"+continuousFiveCount+ " blues.size:" +blues.size()+" countList.size:" +countList.size() +" 重复次数："+ isRepeatCount);
         return countList;
+    }
+
+    private static int compireWithWinngsNum(List<Integer> originBlueItemArray) {
+        //获取已经中间的排列组合
+        Iterator<Set<Integer>> iterator= getHadDballs2().iterator();
+        int count = 0;
+        Set<Set<Integer>> mapped = new HashSet<>();
+        while (iterator.hasNext()) {
+            Set<Integer> dball = iterator.next();
+            List<Integer> blueItemComArray = new ArrayList<Integer>(dball);
+            Collections.sort(blueItemComArray);
+
+
+            List<Integer> resultList = new ArrayList<>();
+            for (Integer integer : originBlueItemArray) {
+                if (blueItemComArray.contains(integer)) {
+                    resultList.add(integer);
+                }
+            }
+
+            int countItem = resultList.size();
+            if (countItem>4){
+                mapped.add(dball);
+                count++;
+                System.out.println(blueItemComArray + " "+originBlueItemArray+"存在相同号："+resultList);
+            }
+        }
+        if (mapped.size()>0) {
+//            System.out.println("mapped:"+mapped.size());
+        }
+
+        return mapped.size();
     }
 
     /**
