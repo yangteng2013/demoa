@@ -18,14 +18,85 @@ public class DBall {
 
 //        init();
 //        init2();
-        init3();
+//        init3();
+
+        //需要生成多少组
+        int countGroup = 10;
+        //需要生成10组双色球
+        List<DoubleBallBean> getCountGroupBalls = generalDoubleBalls(countGroup);
+
+        if (getCountGroupBalls!=null && getCountGroupBalls.size()>0) {
+//            打印随机生成双色球
+            for (DoubleBallBean getCountGroupBall : getCountGroupBalls) {
+                System.out.println("随机生成的双色球："+getCountGroupBall.toString());
+            }
+
+        }
+
+
+    }
+
+    /**
+     * 生成{@param countGroup}组双色球
+     * @param countGroup 多少组
+     * @return
+     */
+    private static List<DoubleBallBean> generalDoubleBalls(int countGroup) {
+        List<DoubleBallBean> doubleBallBeanList = new ArrayList<>();
+
+        //默认随机生成一组
+        if (countGroup<=0) {
+            countGroup = 1;
+        }
+
+        for (int i = 0; i < countGroup; i++) {
+            DoubleBallBean doubleBallBean = genDoubleBall();
+            doubleBallBeanList.add(doubleBallBean);
+        }
+
+        return doubleBallBeanList;
+    }
+
+    /**
+     * 随机生成一组双色球
+     * @return
+     */
+    private static DoubleBallBean genDoubleBall() {
+        Random random = new Random();
+
+        // 生成红球
+        int[] redBalls = new int[6];
+        for (int i = 0; i < redBalls.length; i++) {
+            redBalls[i] = random.nextInt(33) + 1;
+            for (int j = 0; j < i; j++) {
+                if (redBalls[i] == redBalls[j]) {
+                    i--;
+                    break;
+                }
+            }
+        }
+        // 生成蓝球
+        int blueBall = random.nextInt(16) + 1;
+
+//        // 输出结果
+//        System.out.println("红球：" + redBalls[0] + " " + redBalls[1] + " " + redBalls[2] + " " + redBalls[3] + " " + redBalls[4] + " " + redBalls[5]);
+//        System.out.println("蓝球：" + blueBall);
+        Arrays.sort(redBalls);
+        DoubleBallBean ballBean = new DoubleBallBean();
+        ballBean.redBalls = new ArrayList<>();
+        for (int redBall : redBalls) {
+            ballBean.redBalls.add(redBall);
+        }
+
+        ballBean.blueBall = blueBall;
+        return ballBean;
     }
 
     private static void init3() {
 
         getHadDballs2();
 
-        int winningsNoCount = compireWithWinngsNum(blueItemComArray);
+//        int winningsNoCount = compireWithWinngsNum(blueItemComArray);
 
     }
 
@@ -219,7 +290,7 @@ public class DBall {
         while (iterator.hasNext()) {
             DoubleBallBean cItem = (DoubleBallBean) iterator.next();
             int itemCount = 0;
-            for (Integer integer : cItem.blueBalls) {
+            for (Integer integer : cItem.redBalls) {
                 if (integer.equals(i) || integer.equals(i1)) {
                     itemCount++;
                 }
@@ -267,7 +338,7 @@ public class DBall {
         while (iterator.hasNext()) {
             DoubleBallBean items = (DoubleBallBean) iterator.next();
             for (List<Integer> integers : hadAl) {
-                boolean equals = compareWithItem(items.blueBalls, integers);
+                boolean equals = compareWithItem(items.redBalls, integers);
                 if (equals) {
                     System.out.println("compareWith items:" + items);
                     iterator.remove();
@@ -303,11 +374,11 @@ public class DBall {
         while (iterator.hasNext()) {
             DoubleBallBean items = (DoubleBallBean) iterator.next();
             Set<Integer> cap = new HashSet<>();
-            for (int i = items.blueBalls.size() - 1; i >= 0; i--) {
+            for (int i = items.redBalls.size() - 1; i >= 0; i--) {
                 if (i == 0) {
                     break;
                 }
-                int a = items.blueBalls.get(i) - items.blueBalls.get(i - 1);
+                int a = items.redBalls.get(i) - items.redBalls.get(i - 1);
                 cap.add(a);
             }
             if (cap.size() == 1) {
@@ -338,7 +409,7 @@ public class DBall {
             int rangeMid = 0;
             int rangeBig = 0;
 
-            for (Integer item : items.blueBalls) {
+            for (Integer item : items.redBalls) {
                 if (item % 2 == 0) {
                     count++;
                 }
@@ -456,14 +527,14 @@ public class DBall {
             if (winningsNoCount<1) {
                 continue;
             }
-            ballBean.blueBalls = blueItemComArray;
-            ballBean.redBall = getRandom();
+            ballBean.redBalls = blueItemComArray;
+            ballBean.blueBall = getRandom();
             countList.add(ballBean);
 //            //检查当前的篮球是否包含20-29的数，因为判定本期一定会有20+的球出现；
-//            boolean isFlag = checkBlueBalls(blueItemComArray);
-//            boolean isHadSeven = checkBlueBallsHadSeven(blueItemComArray);
+//            boolean isFlag = checkredBalls(blueItemComArray);
+//            boolean isHadSeven = checkredBallsHadSeven(blueItemComArray);
 //            if (isFlag && !isHadSeven) {
-//                ballBean.blueBalls = blueItemComArray;
+//                ballBean.redBalls = blueItemComArray;
 //                ballBean.redBall = getRandom();
 //                System.out.println(ballBean);
 //                countList.add(ballBean);
@@ -549,7 +620,7 @@ public class DBall {
     }
 
 
-    private static boolean checkBlueBallsHadSeven(List<Integer> blueItemComArray) {
+    private static boolean checkredBallsHadSeven(List<Integer> blueItemComArray) {
         for (Integer integer : blueItemComArray) {
             if (integer.equals(7)) {
                 return true;
@@ -567,7 +638,7 @@ public class DBall {
     }
 
     ////检查当前的篮球是否包含20-29的数，因为判定本期一定会有20+的球出现；
-    private static boolean checkBlueBalls(List<Integer> blueItemComArray) {
+    private static boolean checkredBalls(List<Integer> blueItemComArray) {
         Iterator iterator = blueItemComArray.iterator();
         boolean isFlag=false;
         while (iterator.hasNext()) {
@@ -604,7 +675,7 @@ public class DBall {
             DoubleBallBean curItem = (DoubleBallBean) iterator.next();
             for (List<Integer> integers : hadGoal) {
                 int count = 0;
-                for (Integer integer : curItem.blueBalls) {
+                for (Integer integer : curItem.redBalls) {
                     for (Integer integer1 : integers) {
                         if (integer.equals(integer1)) {
                             count++;
@@ -638,14 +709,14 @@ public class DBall {
         System.out.println("aNos.size=" + aNos.size());
         System.out.println("checkLasGoal完成后：" + aNos);
         for (DoubleBallBean aNo : aNos) {
-            for (int i = 0; i < aNo.blueBalls.size(); i++) {
-                if (i==aNo.blueBalls.size()-1){
-                    System.out.print(aNo.blueBalls.get(i)+"");
+            for (int i = 0; i < aNo.redBalls.size(); i++) {
+                if (i==aNo.redBalls.size()-1){
+                    System.out.print(aNo.redBalls.get(i)+"");
                 }else {
-                    System.out.print(aNo.blueBalls.get(i)+" ");
+                    System.out.print(aNo.redBalls.get(i)+" ");
                 }
             }
-            System.out.println("+"+aNo.redBall);
+            System.out.println("+"+aNo.blueBall);
         }
 
     }
@@ -655,7 +726,7 @@ public class DBall {
         Set<List<Integer>> res = new HashSet<>();
         for (List<Integer> integers : hadGoal) {
             int count = 0;
-            for (Integer integer : curItem.blueBalls) {
+            for (Integer integer : curItem.redBalls) {
                 for (Integer integer1 : integers) {
                     if (integer.equals(integer1)) {
                         count++;
@@ -664,7 +735,7 @@ public class DBall {
                 if (count > 4) {
 //                        System.out.println("准备remove："+integers);
 //                        System.out.println("准备remove1："+curItem);
-                    res.add(curItem.blueBalls);
+                    res.add(curItem.redBalls);
                     shouldMove = true;
                     System.out.println("最里的循环");
                     break;

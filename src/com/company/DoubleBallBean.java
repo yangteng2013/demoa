@@ -5,8 +5,8 @@ import java.util.List;
 
 public class DoubleBallBean {
 
-    public List<Integer> blueBalls;
-    public int redBall;
+    public List<Integer> redBalls;
+    public int blueBall;
 
     @Override
     public String toString() {
@@ -16,9 +16,9 @@ public class DoubleBallBean {
 //                "blueBalls=" + blueBalls +
 //                ", redBall=" + redBall +
 //                '}';
-        StringBuilder stringBuilder = new StringBuilder(",");
-        for (int i = 0; i < blueBalls.size(); i++) {
-            int cvalue = blueBalls.get(i);
+        StringBuilder stringBuilder = new StringBuilder();
+        for (int i = 0; i < redBalls.size(); i++) {
+            int cvalue = redBalls.get(i);
             if (cvalue<=9) {
                 stringBuilder.append(String.format("0%d",cvalue));
             }else {
@@ -28,7 +28,11 @@ public class DoubleBallBean {
 //            }
             stringBuilder.append(",");
         }
-        stringBuilder.append(redBall);
+        if (blueBall<10) {
+            stringBuilder.append(String.format("0%d",blueBall));
+        }else {
+            stringBuilder.append(blueBall);
+        }
         return stringBuilder.toString();
 
 
