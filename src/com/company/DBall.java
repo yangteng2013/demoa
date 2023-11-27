@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.util.*;
 
+import static java.lang.System.exit;
+
 /**
  * https://kaijiang.78500.cn/ssq/
  * <p>
@@ -13,6 +15,7 @@ import java.util.*;
  */
 public class DBall {
     static List<List<Integer>> hadAl = new ArrayList<List<Integer>>();
+    private static final int SAMECOUNT = 6; //2组红球进行比较，相同个数>=4个时，就打印出来
 
     public static void main(String[] args) {
 
@@ -21,18 +24,19 @@ public class DBall {
 //        init3();
 
         //需要生成多少组
-        int countGroup = 10;
+        int countGroup = 1000;
         //需要生成10组双色球
         List<DoubleBallBean> getCountGroupBalls = generalDoubleBalls(countGroup);
 
         if (getCountGroupBalls!=null && getCountGroupBalls.size()>0) {
 //            打印随机生成双色球
-            for (DoubleBallBean getCountGroupBall : getCountGroupBalls) {
-                System.out.println("随机生成的双色球："+getCountGroupBall.toString());
+            for (int i = 0; i < getCountGroupBalls.size(); i++) {
+                System.out.println("第"+i+"次随机生成的双色球："+ getCountGroupBalls.get(i).toString());
             }
 
         }
 
+        exit(0);
 
     }
 
@@ -51,7 +55,9 @@ public class DBall {
 
         for (int i = 0; i < countGroup; i++) {
             DoubleBallBean doubleBallBean = genDoubleBall();
-            doubleBallBeanList.add(doubleBallBean);
+            if (doubleBallBean.redBalls!=null) {
+                doubleBallBeanList.add(doubleBallBean);
+            }
         }
 
         return doubleBallBeanList;
@@ -63,7 +69,7 @@ public class DBall {
      */
     private static DoubleBallBean genDoubleBall() {
         Random random = new Random();
-
+        DoubleBallBean ballBean = new DoubleBallBean();
         // 生成红球
         int[] redBalls = new int[6];
         for (int i = 0; i < redBalls.length; i++) {
@@ -82,7 +88,23 @@ public class DBall {
 //        System.out.println("红球：" + redBalls[0] + " " + redBalls[1] + " " + redBalls[2] + " " + redBalls[3] + " " + redBalls[4] + " " + redBalls[5]);
 //        System.out.println("蓝球：" + blueBall);
         Arrays.sort(redBalls);
-        DoubleBallBean ballBean = new DoubleBallBean();
+
+
+        //随机的一组红色求跟历史中奖记录进行匹配是否存在超过指定的个数，
+        checkGoaled(redBalls);
+
+        //检查是否全部是基数
+        boolean allOdd = checkArrOdd(redBalls);
+        if (allOdd) {
+            //所有都是奇数，则不添加
+            return ballBean;
+        }
+        //检查是否全部是偶数
+        boolean allEven = checkArrEven(redBalls);
+        if (allEven) {
+            //所有都是偶数，则不添加
+            return ballBean;
+        }
         ballBean.redBalls = new ArrayList<>();
         for (int redBall : redBalls) {
             ballBean.redBalls.add(redBall);
@@ -91,6 +113,104 @@ public class DBall {
         ballBean.blueBall = blueBall;
         return ballBean;
     }
+
+    private static boolean checkArrOdd(int[] redBalls) {
+        boolean allOdd = true;
+        for (int redBall : redBalls) {
+            if (redBall%2==0) {
+                allOdd = false;
+                break;
+            }
+        }
+        return allOdd;
+    }
+    private static boolean checkArrEven(int[] redBalls) {
+        boolean allEven = true;
+        for (int redBall : redBalls) {
+            if (redBall%2!=0) {
+                allEven = false;
+                break;
+            }
+        }
+        return allEven;
+    }
+
+    private static boolean checkGoaled(int[] redBalls) {
+        List<Integer> sameRedBalls = new ArrayList<>();
+        //获取已经中间的排列组合
+        Iterator<Set<Integer>> iterator= getHadDballs2().iterator();
+        int countEven=0;
+        int countOdd=0;
+
+        while (iterator.hasNext()) {
+            Set<Integer> dball = iterator.next();
+            List<Integer> blueItemComArray = new ArrayList<Integer>(dball);
+            Collections.sort(blueItemComArray);
+            int[] arr2 = blueItemComArray.stream().mapToInt(Integer::intValue).toArray();
+
+
+//            boolean allEven = checkArrEven(arr2);
+//            if (allEven) {
+//                countEven++;
+//                System.out.println("下面的中奖号码全是偶数");
+//                for (int i : arr2) {
+//                    System.out.print(i+",");
+//                }
+//                System.out.println("上面的中奖号码全是偶数");
+//            }
+//            boolean allOdd = checkArrOdd(arr2);
+//            if (allOdd) {
+//                countOdd++;
+//                System.out.println("下面的中奖号码全是奇数");
+//                for (int i : arr2) {
+//                    System.out.print(i+",");
+//                }
+//                System.out.println("上面的中奖号码全是奇数");
+//            }
+
+            List<Integer> commoneElements = check2GroupsArrays(redBalls, arr2,SAMECOUNT);
+            if (commoneElements.size()>=0) {
+                sameRedBalls.addAll(commoneElements);
+            }
+        }
+//        System.out.println(String.format("总共有%d个全是偶数的，%d个全是奇数的",countEven,countOdd));
+        return sameRedBalls.size()>0;
+    }
+
+
+    private static List<Integer> check2GroupsArrays(int[] arr1, int[] arr2, int sameCount){
+
+        List<Integer> dests = new ArrayList<>();
+
+        Set<Integer>set1 = new HashSet<>();
+        Set<Integer>commonElements = new HashSet<>();
+        for (int i : arr1) {
+            set1.add(i);
+        }
+        for (int i : arr2) {
+            if (set1.contains(i)){
+                commonElements.add(i);
+            }
+        }
+        if (commonElements.size()>=sameCount) {
+
+            StringBuilder stringBuilder = new StringBuilder();
+            for (int i : arr1) {
+                stringBuilder.append(String.valueOf(i)).append("、");
+            }
+            StringBuilder stringBuilder2 = new StringBuilder();
+            for (int i2 : arr2) {
+                stringBuilder2.append(String.valueOf(i2)).append("、");
+            }
+            System.out.println(String.format("存在%s个相同元素的组-》arr1:"+stringBuilder.toString()+"  arr2:"+stringBuilder2, sameCount));
+            for (Integer commonElement : commonElements) {
+                dests.add(commonElement);
+            }
+            return dests;
+        }
+        return new ArrayList<Integer>();
+    }
+
 
     private static void init3() {
 
